@@ -144,4 +144,4 @@ Applied with `git apply -p1 --directory=mupen64plus-core/upstream` (core: mupen6
 - `ui/GxDialogs.kt`: `GxDialogSpec` (Choice, Slider, Text, Confirm) rendered by `GxDialogHost` inside `PrefsApp`.
 - `AppCompatPreferenceFragment.showComposeDialog()` intercepts `onDisplayPreferenceDialog` for list, emulation-profile, seek-bar and edit-text preferences; `ConfirmationDialog` now hosts a Compose confirm body.
 - Still legacy (AppCompat/Material) dialogs: player map, multi-select, shader and cheat pickers, `Prompt.*`, locale, popups, menu dialog, cheat editors, netplay setup, progress and profile-name dialogs.
-- Only the list and slider dialogs were verified on a device; text entry, confirm and the profile-manager list need another pass.
+- Verified on a device (touch and D-pad / A / B): list, slider, text entry and confirm dialogs. The profile-manager list (Game settings → Emulation profile) is not yet verified.

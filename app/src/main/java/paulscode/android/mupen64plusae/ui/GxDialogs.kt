@@ -170,7 +170,19 @@ private fun ColumnScope.ChoiceBody(spec: GxDialogSpec.Choice, onDismiss: () -> U
         }
     }
     DialogTitle(spec.title)
-    LazyColumn(Modifier.weight(1f, fill = false), state = listState, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    var listHasFocus by remember { mutableStateOf(false) }
+    LazyColumn(
+        Modifier.weight(1f, fill = false)
+            .onFocusChanged { listHasFocus = it.hasFocus }
+            .onPreviewKeyEvent { e ->
+                val dpad = e.key == Key.DirectionDown || e.key == Key.DirectionUp
+                if (dpad && !listHasFocus) {
+                    if (e.type == KeyEventType.KeyDown) runCatching { selectedFocus.requestFocus() }
+                    true
+                } else false
+            },
+        state = listState, verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
         itemsIndexed(spec.entries) { index, entry ->
             val isSelected = index == spec.selected
             val first = if (spec.selected in spec.entries.indices) isSelected else index == 0
