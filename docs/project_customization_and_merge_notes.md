@@ -117,6 +117,6 @@ Upstream: https://github.com/mupen64plus-ae/mupen64plus-ae (GPL-3.0, active; las
 
 - Adopted: `32e19db5a` Allow loading 64MB+ ROMs; `33bf70215` Fix resource leaks (all files except `gradle.properties`); `-dontwarn com.github.luben.zstd.**` in `proguard-rules.pro`.
 - Deliberately NOT adopted: `62ba760e3` manual ROM path entry. It adds `MANAGE_EXTERNAL_STORAGE` (restricted by Google Play) and only helps Android TV 11+.
-- Not yet adopted: `03b4c0de3` RetroAchievements via rcheevos (151 files, needs native rebuild of `librcheevos.a` for all ABIs, network config for retroachievements.org, and an RA account + ROM to test; rcheevos is MIT).
+- Adopted with changes: `03b4c0de3` RetroAchievements via rcheevos (MIT). Changes vs upstream: removed the exported `RetroAchievementsHostOverrideReceiver` (any app could redirect the user's token to its own server), no token in logcat, own User-Agent (`XM64EmulatorPlus (Android)`), RA settings screen uses the `NoActionBar` shell theme, and a "RetroAchievements" row in Settings → Tools (the drawer entry is unreachable in the new UI). Vendored in `ndkLibs/rcheevos`; rebuild `librcheevos.a` with `ndkLibs/rcheevos-build/build.sh`. Verified on device only up to "enabled, not logged in" (no RA account/ROM available to test unlocking).
 - Do not bulk-apply upstream `strings.xml` hunks: they also escape `<small>` as `&lt;small>`, which changes how our labels render.
 

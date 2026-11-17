@@ -43,6 +43,9 @@
                 android:id="@+id/menuItem_categoryNetplay"
                 android:icon="@drawable/ic_users"
                 android:title="@string/categoryNetplay_title"/>
+            <item
+                android:id="@+id/menuItem_categoryRetroAchievements"
+                android:title="@string/categoryRetroAchievements_title"/>
         </menu>
     </item>
     <item

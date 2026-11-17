@@ -23,6 +23,7 @@ Improvements
 - Redesigned dark user interface: gallery, new Settings hub, preference screens with toolbar, themed dialogs, import screen and splash.
 - Netplay: fixed a client crash that kept a device out of a session after a failed connection to a stale mDNS entry.
 - New "Open source licenses" screen in the app (Settings → Tools).
+- RetroAchievements (softcore) support, from upstream and hardened (Settings → Tools → RetroAchievements). It only connects to retroachievements.org when enabled and logged in.
 - Backported from upstream Mupen64Plus AE: support for ROMs larger than 64 MB, resource-leak fixes, locale tag fix, duplicate vibration call removed.
 - Old profiles that used the removed angrylion-plus plugin switch automatically to the default plugin.
 
@@ -30,7 +31,7 @@ Removed
 - The angrylion-plus software renderer (its MAME license forbids commercial use and is not GPL-compatible).
 - Upstream FAQ, help-forum and credits menu entries and links.
 
-Note: this fork is based on an earlier upstream snapshot. Upstream RetroAchievements support and upstream's manual ROM-path entry (which needs the restricted "All files access" permission) are not included. Full details: [NOTICE](NOTICE) and `docs/project_customization_and_merge_notes.md`.
+Note: this fork is based on an earlier upstream snapshot. Upstream's manual ROM-path entry (which needs the restricted "All files access" permission) is not included. Full details: [NOTICE](NOTICE) and `docs/project_customization_and_merge_notes.md`.
 
 ## Build Instructions
 
@@ -49,6 +50,7 @@ Release signing keys are not part of this repository; build with your own keysto
 
 Setting up a clean clone (these files are not tracked here):
 - `ndkLibs/libs/*`: take them from the upstream mupen64plus-ae repository.
+- `ndkLibs/libs/*/*/librcheevos.a`: build with `ndkLibs/rcheevos-build/build.sh <path-to-ndk>` (sources are in `ndkLibs/rcheevos`).
 - `gradle.properties` (present upstream) and `local.properties` (your SDK path).
 - On macOS, generate the `asm_defines` headers with `mupen64plus-core/upstream/tools/gen_asm_script.sh`, because the BSD awk shipped with macOS cannot run `gen_asm_defines.awk`.
 

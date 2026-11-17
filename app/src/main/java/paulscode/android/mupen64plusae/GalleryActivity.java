@@ -821,6 +821,9 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
         } else if (item.getItemId() == R.id.menuItem_categoryNetplay) {
             ActivityHelper.startNetplayPrefsActivity( this );
             return true;
+        } else if (item.getItemId() == R.id.menuItem_categoryRetroAchievements) {
+            ActivityHelper.startRetroAchievementsPrefsActivity( this );
+            return true;
          } else if (item.getItemId() == R.id.menuItem_categoryDefaults) {
             ActivityHelper.startDefaultPrefsActivity( this );
             return true;
@@ -1350,7 +1353,7 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
                 R.id.rowLibrary, R.id.rowDisplay, R.id.rowShaders, R.id.rowAudio, R.id.rowInput,
                 R.id.rowTouchscreen, R.id.rowData, R.id.rowEmuProfiles, R.id.rowTouchProfiles,
                 R.id.rowControllerProfiles, R.id.rowImportExport, R.id.rowLanguage, R.id.rowReportBug,
-                R.id.rowLicenses
+                R.id.rowLicenses, R.id.rowRetroAchievements
         };
 
         for (int id : rowIds) {
@@ -1401,6 +1404,8 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
             final CharSequence title = getText(R.string.menuItem_localeOverride);
             final LocaleDialog localeDialog = LocaleDialog.newInstance(title.toString());
             localeDialog.show(getSupportFragmentManager(), STATE_LOCALE_DIALOG);
+        } else if (id == R.id.rowRetroAchievements) {
+            ActivityHelper.startRetroAchievementsPrefsActivity(this);
         } else if (id == R.id.rowLicenses) {
             LicensesDialog.show(this);
         } else if (id == R.id.rowReportBug) {

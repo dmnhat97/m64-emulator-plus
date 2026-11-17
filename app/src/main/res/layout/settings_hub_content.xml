@@ -115,6 +115,10 @@
                 <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_help" />
                 <TextView style="@style/SettingsTextStyle" android:text="@string/menuItem_reportBug" />
             </LinearLayout>
+            <LinearLayout android:id="@+id/rowRetroAchievements" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_about" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/categoryRetroAchievements_title" />
+            </LinearLayout>
             <LinearLayout android:id="@+id/rowLicenses" style="@style/SettingsRowStyle">
                 <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_about" />
                 <TextView style="@style/SettingsTextStyle" android:text="@string/menuItem_licenses" />

@@ -18,6 +18,7 @@ android {
     }
 
     buildFeatures.viewBinding = true
+    buildFeatures.buildConfig = true
 
     defaultConfig {
         applicationId = "com.m64.fx.plus.emulate"

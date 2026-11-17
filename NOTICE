@@ -36,6 +36,10 @@ Improvements
     dialog was dismissed after being detached when a stale mDNS record caused a
     failed connection).
   * Added an "Open source licenses" screen (this notice, GPL text, link to source).
+  * RetroAchievements support (softcore) from upstream Mupen64Plus AE, hardened:
+    the exported host-override receiver was removed, login tokens are no longer
+    written to the log, and the app identifies itself with its own user agent.
+    It connects to retroachievements.org only when enabled and logged in.
   * Backported from upstream Mupen64Plus AE (GPLv3): support for ROMs larger than
     64 MB (core), fixes for resource leaks in file/zip/texture handling, a locale
     tag fix and removal of a duplicate legacy vibration call.
@@ -48,9 +52,8 @@ Removed
 
 Other
   * Renamed to "XM64 Emulator Plus", new application ID, new launcher/splash assets.
-  * Based on an earlier upstream snapshot. Not included: upstream RetroAchievements
-    support, and upstream's manual ROM-path entry (it requires the restricted
-    "All files access" permission).
+  * Based on an earlier upstream snapshot. Not included: upstream's manual ROM-path
+    entry (it requires the restricted "All files access" permission).
 
 Individual source files keep their original copyright headers. Upstream files
 that carry no per-file header are covered by the upstream project's license,
@@ -78,6 +81,7 @@ listed below.
   libusb                         LGPL v2.1                        mupen64plus-input-raphnet/libusb/COPYING
   SoundTouch                     LGPL v2.1                        ndkLibs/soundtouch/COPYING.TXT
   libpng                         libpng license                   ndkLibs/png/LICENSE
+  rcheevos                       MIT                              ndkLibs/rcheevos/LICENSE
   FreeType                       FreeType Project License         ndkLibs/freetype/NOTICE
   SDL2_net                       zlib-style license               ndkLibs/SDL2_net/upstream (file headers)
   hidapi                         GPLv3 / BSD / original HIDAPI    ndkLibs/hidapi/upstream (file headers)
