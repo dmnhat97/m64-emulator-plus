@@ -129,3 +129,11 @@ Applied with `git apply -p1 --directory=mupen64plus-core/upstream` (core: mupen6
 - Still open (conflict, need older upstream commits first): core ba95bab9 (netplay packet validation), 11e5b529 and cbab344e (64DD bounds), 94a382c8 (Pokemon Stadium GB Tower), 2b347d45 (dynarec x18); GLideN64 a04081ad (Zelda MM Pictograph Box), 41c7ba27, 46eaaf2d, 09dad6ce, ecb5775f, 47473c2b, e8a5e829 and the F3DEX3 work. These need a larger sync of the vendored snapshots.
 - Smoke-tested on a device (CPH2499, arm64): Glide64 and GLideN64-Fast both run the demo ROM; no accuracy testing with commercial games.
 
+## Gamer UI (Jetpack Compose)
+
+- Code: `app/src/main/java/paulscode/android/mupen64plusae/ui/` (`HomeScreen.kt`, `HomeState.kt`, `GamerTheme.kt`, `CoverImage.kt`, `GamerUi.kt`). `GalleryActivity` (Java) hosts a `ComposeView` (`@id/composeHome`, last child of the coordinator layout), feeds it library data from `refreshGrid(List, List)` and maps its actions (`HomeActions`) onto the existing launch, settings, remove and shortcut logic. The legacy XML library views stay in the layout but are hidden (`mComposeActive`); they must not be re-shown (see the guards in `updateEmptyStateVisibility`, `setHomeTab`, `onGalleryItemClick`).
+- Input mode: `HomeState.inputMode` is GAMEPAD when a controller is connected (`InputManager` listener in `GalleryActivity`) or when a D-pad / gamepad key is pressed (`dispatchKeyEvent`), and TOUCH again on any touch. In controller mode the host forces landscape and hides the system bars; in touch mode the orientation is left to the user. Focus rings, auto-focus and the hint bar are gamepad-only (`LocalGamepadUi`).
+- Per-game favorites and play time live in `files/playStats.cfg` (`util/PlayStats.java`); the game process records play time, the library process records favorites.
+- Build: Kotlin 2.4.21 + Compose BOM 2026.06.01 (UI 1.11.4) on AGP 8.13. Compose 1.12 (BOM 2026.08+) needs AGP 9.1+ and compileSdk 37, so upgrading Compose further means upgrading AGP/Gradle first (large change for the NDK modules); do that on its own branch.
+- Not yet migrated to Compose: the in-game drawer/overlay (`GameActivity`), preference screens and dialogs.
+

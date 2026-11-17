@@ -65,6 +65,8 @@ public class GalleryItem
     public final String zipUri;
     public final WeakReference<Context> context;
     public final boolean isHeading;
+    public boolean favorite = false;
+    public long playSeconds = 0;
     public BitmapDrawable artBitmap;
     public final float scale;
     
@@ -257,6 +259,10 @@ public class GalleryItem
                 
                 TextView tv1 = view.findViewById( R.id.text1 );
                 tv1.setText( item.toString() );
+
+                TextView favBadge = view.findViewById( R.id.favBadge );
+                if( favBadge != null )
+                    favBadge.setVisibility( !item.isHeading && item.favorite ? View.VISIBLE : View.GONE );
 
                 Activity tempActivity = mActivity.get();
 

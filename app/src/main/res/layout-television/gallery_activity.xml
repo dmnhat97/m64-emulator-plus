@@ -40,6 +40,7 @@
 
 
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_black_gradient"
@@ -140,6 +141,12 @@
             </androidx.appcompat.widget.Toolbar>
 
         </com.google.android.material.appbar.AppBarLayout>
+
+        <!-- Gamer home UI (Jetpack Compose). The legacy views above are hidden when it is attached. -->
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeHome"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

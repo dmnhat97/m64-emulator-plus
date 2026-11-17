@@ -33,6 +33,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.SystemClock;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -110,6 +111,7 @@ import paulscode.android.mupen64plusae.util.CountryCode;
 import paulscode.android.mupen64plusae.util.DisplayResolutionData;
 import paulscode.android.mupen64plusae.util.DisplayWrapper;
 import paulscode.android.mupen64plusae.util.FileUtil;
+import paulscode.android.mupen64plusae.util.PlayStats;
 import paulscode.android.mupen64plusae.util.LocaleContextWrapper;
 import paulscode.android.mupen64plusae.util.Notifier;
 import paulscode.android.mupen64plusae.util.RomDatabase;
@@ -201,6 +203,7 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
     private String mRomPath = null;
     private String mZipPath = null;
     private String mRomMd5 = null;
+    private long mPlayStartMs = 0;
     private String mRomCrc = null;
     private String mRomGoodName = null;
     private String mRomDisplayName = null;
@@ -673,6 +676,7 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
         super.onResume();
         Log.i(TAG, "onResume");
         RetroAchievementsManager.setGameLoadListener(this);
+        mPlayStartMs = SystemClock.elapsedRealtime();
 
         if (mSensorController != null) {
             mSensorController.onResume();
@@ -699,6 +703,11 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
     public void onPause() {
         super.onPause();
         Log.i(TAG, "onPause");
+        if (mPlayStartMs != 0)
+        {
+            PlayStats.addPlaySeconds(this, mRomMd5, (SystemClock.elapsedRealtime() - mPlayStartMs) / 1000);
+            mPlayStartMs = 0;
+        }
         RetroAchievementsManager.setGameLoadListener(null);
         if (mTrackerContainer != null) {
             mTrackerContainer.removeAllViews();

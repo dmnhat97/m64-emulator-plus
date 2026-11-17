@@ -32,12 +32,23 @@
         
         <TextView
             android:id="@+id/text1"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="@string/galleryItemAdapter_dummyText"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/mupen_text_primary"
             android:maxLines="2"
             android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/favBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="&#9733;"
+            android:textColor="#FFC857"
+            android:textSize="16sp"
+            android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>

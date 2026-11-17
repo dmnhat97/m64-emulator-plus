@@ -52,3 +52,6 @@ crashreport.txt
 
 # Transifex client
 tx.exe
+
+# Kotlin compiler session files
+.kotlin/

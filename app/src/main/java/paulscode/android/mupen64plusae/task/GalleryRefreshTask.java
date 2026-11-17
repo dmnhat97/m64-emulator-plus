@@ -38,6 +38,7 @@ import java.util.Locale;
 
 import paulscode.android.mupen64plusae.GalleryItem;
 import paulscode.android.mupen64plusae.persistent.ConfigFile;
+import paulscode.android.mupen64plusae.util.PlayStats;
 import paulscode.android.mupen64plusae.persistent.GlobalPrefs;
 import paulscode.android.mupen64plusae.util.CountryCode;
 import paulscode.android.mupen64plusae.util.FileUtil;
@@ -52,6 +53,7 @@ public class GalleryRefreshTask
     private final GalleryRefreshFinishedListener mListener;
     private final GlobalPrefs mGlobalPrefs;
     private final WeakReference<Context> mContext;
+    private ConfigFile mStats = null;
     private final String mSearchQuery;
     private final List<GalleryItem> mItems = new ArrayList<>();
     private final List<GalleryItem> mAllItems = new ArrayList<>();
@@ -175,6 +177,11 @@ public class GalleryRefreshTask
         {
             item = new GalleryItem(mContext.get(), md5, crc, headerName, countryCode, goodName, displayName, romPath,
                     zipPath, artPath, lastPlayed, mGlobalPrefs.coverArtScale);
+            if (mStats != null)
+            {
+                item.favorite = PlayStats.isFavorite(mStats, md5);
+                item.playSeconds = PlayStats.playSeconds(mStats, md5);
+            }
         }
         return item;
     }
@@ -186,6 +193,9 @@ public class GalleryRefreshTask
      */
     public void generateGridItemsAndSaveConfig(List<GalleryItem> items, List<GalleryItem> allItems, @NonNull List<GalleryItem> recentItems)
     {
+        if (mContext.get() != null)
+            mStats = PlayStats.load(mContext.get());
+
         final String query = mSearchQuery.toLowerCase( Locale.US );
         String[] searches = null;
         if( query.length() > 0 )

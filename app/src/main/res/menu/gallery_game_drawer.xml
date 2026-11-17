@@ -22,6 +22,10 @@
         android:title="@string/actionStartNetplay_title"
         android:titleCondensed="@string/actionStartNetplay_summary"/>
     <item
+        android:id="@+id/menuItem_favorite"
+        android:icon="@drawable/ic_star"
+        android:title="@string/menuItem_favorite"/>
+    <item
         android:id="@+id/menuItem_settings"
         android:icon="@drawable/ic_settings"
         android:title="@string/menuItem_settings"/>

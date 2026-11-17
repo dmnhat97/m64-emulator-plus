@@ -111,6 +111,7 @@
         </FrameLayout>
 
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:elevation="0dp"
@@ -195,6 +196,50 @@
 
             </androidx.appcompat.widget.Toolbar>
 
+            <LinearLayout
+                android:id="@+id/filterBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="22dp"
+                android:paddingEnd="22dp"
+                android:paddingBottom="10dp"
+                app:layout_scrollFlags="scroll|enterAlways|snap">
+
+                <TextView
+                    android:id="@+id/filterAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="88dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/bg_filter_chip"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:nextFocusDown="@id/gridview"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="@string/gallery_filter_all"
+                    android:textColor="@color/mupen_text_primary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/filterFavorites"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="88dp"
+                    android:background="@drawable/bg_filter_chip"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:nextFocusDown="@id/gridview"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="@string/gallery_filter_favorites"
+                    android:textColor="@color/mupen_text_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
         </com.google.android.material.appbar.AppBarLayout>
 
         <FrameLayout
@@ -271,6 +316,12 @@
                 android:onClick="onTabCenterActionClicked"
                 android:contentDescription="@string/menuItem_refreshRoms" />
         </FrameLayout>
+
+        <!-- Gamer home UI (Jetpack Compose). The legacy views above are hidden when it is attached. -->
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeHome"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

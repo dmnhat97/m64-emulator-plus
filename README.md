@@ -20,6 +20,8 @@ No ROMs or BIOS images are included; you must supply your own legally obtained g
 ## What is different from the original Mupen64Plus AE
 
 Improvements
+- New gamer UI (Jetpack Compose): home with a "Continue playing" card, library with search and favorites, game details panel and settings grid. With a controller connected (or when you press the D-pad / a gamepad button) it switches to controller mode: landscape, full screen, focus rings and button hints (A select, B back, X details, Y favorite, L1/R1 switch tab). Touching the screen brings back the clean touch mode, in portrait or landscape; long-press a game to favorite it.
+- Favorites and per-game play time.
 - Redesigned dark user interface: gallery, new Settings hub, preference screens with toolbar, themed dialogs, import screen and splash.
 - Netplay: fixed a client crash that kept a device out of a session after a failed connection to a stale mDNS entry.
 - New "Open source licenses" screen in the app (Settings → Tools).

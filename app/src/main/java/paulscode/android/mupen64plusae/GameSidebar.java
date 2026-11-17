@@ -33,6 +33,7 @@ public class GameSidebar extends MenuListView
 {
     private ImageView mInfoArt;
     private TextView mGameTitle;
+    private TextView mGameStats;
     private GameSidebarActionHandler mActionHandler;
     private View mHeader;
 
@@ -44,6 +45,7 @@ public class GameSidebar extends MenuListView
 
         mInfoArt = mHeader.findViewById( R.id.imageArt );
         mGameTitle = mHeader.findViewById( R.id.gameTitle );
+        mGameStats = mHeader.findViewById( R.id.gameStats );
 
         setClipToPadding(true);
         addHeaderView(mHeader, null, false);
@@ -78,6 +80,14 @@ public class GameSidebar extends MenuListView
         mInfoArt.setImageResource(resourceId);
     }
     
+    public void setStats( String stats )
+    {
+        if( mGameStats == null )
+            return;
+        mGameStats.setText( stats );
+        mGameStats.setVisibility( stats == null || stats.isEmpty() ? View.GONE : View.VISIBLE );
+    }
+
     public void setTitle( String title )
     {
         mGameTitle.setText( title );

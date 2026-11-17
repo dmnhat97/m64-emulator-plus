@@ -44,6 +44,20 @@
         android:ellipsize="end"
         style="@style/TextAppearance.Mupen.Title" />
 
+    <TextView
+        android:id="@+id/gameStats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:focusable="false"
+        android:gravity="center_horizontal"
+        android:lineSpacingExtra="2dp"
+        android:visibility="gone"
+        style="@style/TextAppearance.Mupen.Subtitle" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

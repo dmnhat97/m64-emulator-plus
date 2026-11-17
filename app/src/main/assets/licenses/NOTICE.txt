@@ -35,6 +35,11 @@ Improvements
   * Netplay: fixed a client crash that kept a device out of a session (the setup
     dialog was dismissed after being detached when a stale mDNS record caused a
     failed connection).
+  * New gamer UI built with Jetpack Compose: home with a "Continue playing" hero card, library with
+    search and favorites, game details panel, settings grid. It switches between a controller mode
+    (focus rings, button hints, D-pad / A / B / X / Y / L1 / R1 navigation, landscape, full screen)
+    and a clean touch mode (portrait or landscape) depending on how the player controls it.
+  * Favorites and play-time statistics per game.
   * Added an "Open source licenses" screen (this notice, GPL text, link to source).
   * RetroAchievements support (softcore) from upstream Mupen64Plus AE, hardened:
     the exported host-override receiver was removed, login tokens are no longer
@@ -94,6 +99,7 @@ listed below.
   miniupnpc                      BSD 3-clause                     ndkLibs/miniupnp/LICENSE
   libnatpmp                      BSD 3-clause                     ndkLibs/libnatpmp/LICENSE
   AndroidX, Material Components  Apache License 2.0               https://developer.android.com/jetpack/androidx
+  Jetpack Compose, Kotlin        Apache License 2.0               https://developer.android.com/jetpack/compose , https://kotlinlang.org
   Apache Commons (lang3, text,   Apache License 2.0               https://commons.apache.org
     io, compress)
   XZ for Java                    Public domain                    https://tukaani.org/xz/java.html

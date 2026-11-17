@@ -48,6 +48,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import androidx.preference.PreferenceManager;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -96,6 +97,19 @@ import paulscode.android.mupen64plusae.task.SyncProgramsJobService;
 import paulscode.android.mupen64plusae.util.CountryCode;
 import paulscode.android.mupen64plusae.util.DisplayWrapper;
 import paulscode.android.mupen64plusae.util.FileUtil;
+import paulscode.android.mupen64plusae.util.PlayStats;
+import paulscode.android.mupen64plusae.ui.GamerUi;
+import paulscode.android.mupen64plusae.ui.HomeActions;
+import paulscode.android.mupen64plusae.ui.HomeState;
+import paulscode.android.mupen64plusae.ui.InputMode;
+import paulscode.android.mupen64plusae.ui.PlayMode;
+import android.content.pm.ActivityInfo;
+import android.hardware.input.InputManager;
+import android.view.InputDevice;
+import androidx.compose.ui.platform.ComposeView;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import paulscode.android.mupen64plusae.util.LocaleContextWrapper;
 import paulscode.android.mupen64plusae.util.Notifier;
 
@@ -114,6 +128,7 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
     private static final String STATE_REMOVE_FROM_LIBRARY_DIALOG = "STATE_REMOVE_FROM_LIBRARY_DIALOG";
     private static final String STATE_CLEAR_SHADERCACHE_DIALOG = "STATE_CLEAR_SHADERCACHE_DIALOG";
     private static final String STATE_LOCALE_DIALOG = "STATE_LOCALE_DIALOG";
+    private static final String PREF_FAVORITES_ONLY = "galleryFavoritesOnly";
     private static final String STATE_HARDWARE_INFO_POPUP = "STATE_HARDWARE_INFO_POPUP";
     private static final String STATE_SHOW_APP_VERSION_POPUP = "STATE_SHOW_APP_VERSION_POPUP";
     public static final String KEY_IS_LEANBACK = "KEY_IS_LEANBACK";
@@ -149,6 +164,18 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
 
     // Misc.
     private GalleryItem mSelectedItem = null;
+    private boolean mFavoritesOnly = false;
+    private final HomeState mHomeState = new HomeState();
+    private boolean mComposeActive = false;
+    private InputManager mInputManager = null;
+    private final InputManager.InputDeviceListener mInputDeviceListener = new InputManager.InputDeviceListener()
+    {
+        @Override public void onInputDeviceAdded( int deviceId ) { updateControllerState(); }
+        @Override public void onInputDeviceRemoved( int deviceId ) { updateControllerState(); }
+        @Override public void onInputDeviceChanged( int deviceId ) { updateControllerState(); }
+    };
+    private TextView mFilterAll = null;
+    private TextView mFilterFavorites = null;
     private boolean mDragging = false;
 
     private ScanRomsFragment mCacheRomInfoFragment = null;
@@ -184,6 +211,7 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
                     createSearchMenu();
 
                     mSearchQuery = "";
+                    mHomeState.setQuery( "" );
 
                     if (mSearchView != null) {
                         mSearchView.setQuery( mSearchQuery, true );
@@ -480,6 +508,29 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
         // Configure the game information drawer
         mGameSidebar = findViewById( R.id.gameSidebar );
 
+        mFilterAll = findViewById( R.id.filterAll );
+        mFilterFavorites = findViewById( R.id.filterFavorites );
+        mFavoritesOnly = PreferenceManager.getDefaultSharedPreferences( this ).getBoolean( PREF_FAVORITES_ONLY, false );
+        mFilterAll.setOnClickListener( v -> setFavoritesFilter( false ) );
+        mFilterFavorites.setOnClickListener( v -> setFavoritesFilter( true ) );
+        updateFilterChips();
+
+        final ComposeView composeHome = findViewById( R.id.composeHome );
+        if( composeHome != null )
+        {
+            mComposeActive = true;
+            final int[] legacyViews = { R.id.appBar, R.id.gridview, R.id.homeTabBarWrap, R.id.settingsPanelHost,
+                    R.id.gallery_empty_icon, R.id.gallery_empty_state };
+            for( final int legacyId : legacyViews )
+            {
+                final View legacy = findViewById( legacyId );
+                if( legacy != null )
+                    legacy.setVisibility( View.GONE );
+            }
+            GamerUi.attach( composeHome, mHomeState, createHomeActions() );
+            updateControllerState();
+        }
+
         // Handle events from the side bar
         mGameSidebar.setActionHandler(this, R.menu.gallery_game_drawer);
 
@@ -594,6 +645,8 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
 
     @Override
     public void onPause() {
+        if( mInputManager != null )
+            mInputManager.unregisterInputDeviceListener( mInputDeviceListener );
         Log.i("GalleryActivity", "onPause");
 
         super.onPause();
@@ -610,6 +663,13 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
         Log.i("GalleryActivity", "onResume");
 
         super.onResume();
+
+        if( mInputManager == null )
+            mInputManager = (InputManager) getSystemService( Context.INPUT_SERVICE );
+        if( mInputManager != null )
+            mInputManager.registerInputDeviceListener( mInputDeviceListener, null );
+        updateControllerState();
+
 
         //mRefreshNeeded will be set to true whenever a game is launched
         if(mRefreshNeeded)
@@ -981,6 +1041,10 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
 
             final FragmentManager fm = getSupportFragmentManager();
             confirmationDialog.show(fm, STATE_REMOVE_FROM_LIBRARY_DIALOG);
+        } else if (menuItem.getItemId() == R.id.menuItem_favorite) {
+            PlayStats.setFavorite(this, item.md5, !item.favorite);
+            // Rebuild the library so the star badge, filter and sidebar all pick up the change
+            refreshGridAsync();
         } else if (menuItem.getItemId() == R.id.menuItem_createShortcut) {
             createGameShortcut(item);
         }
@@ -1007,8 +1071,194 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
         }
     }
 
+    private static boolean isGameController( InputDevice device )
+    {
+        if( device == null || device.isVirtual() )
+            return false;
+        final int sources = device.getSources();
+        return ( sources & InputDevice.SOURCE_GAMEPAD ) == InputDevice.SOURCE_GAMEPAD
+                || ( sources & InputDevice.SOURCE_JOYSTICK ) == InputDevice.SOURCE_JOYSTICK;
+    }
+
+    /**
+     * With a controller connected (or on Android TV) the gamer UI switches to its controller layout:
+     * landscape, full screen, focus rings and button hints. Otherwise it stays touch friendly.
+     */
+    private void updateControllerState()
+    {
+        if( !mComposeActive )
+            return;
+        boolean connected = mAppData != null && mAppData.isAndroidTv;
+        for( final int id : InputDevice.getDeviceIds() )
+            connected |= isGameController( InputDevice.getDevice( id ) );
+
+        mHomeState.setGamepadConnected( connected );
+        setRequestedOrientation( connected ? ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE
+                : ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED );
+
+        final WindowInsetsControllerCompat controller =
+                WindowCompat.getInsetsController( getWindow(), getWindow().getDecorView() );
+        if( connected )
+        {
+            controller.setSystemBarsBehavior( WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE );
+            controller.hide( WindowInsetsCompat.Type.systemBars() );
+        }
+        else
+        {
+            controller.show( WindowInsetsCompat.Type.systemBars() );
+        }
+    }
+
+    private static boolean isControllerKey( int keyCode )
+    {
+        return ( keyCode >= KeyEvent.KEYCODE_DPAD_UP && keyCode <= KeyEvent.KEYCODE_DPAD_CENTER )
+                || KeyEvent.isGamepadButton( keyCode );
+    }
+
+    /**
+     * A D-pad or gamepad button press switches the gamer UI to its controller mode and hands the
+     * focus to it, so the very first press already moves the highlight.
+     */
+    @Override
+    public boolean dispatchKeyEvent( KeyEvent event )
+    {
+        if( mComposeActive && event.getAction() == KeyEvent.ACTION_DOWN && isControllerKey( event.getKeyCode() ) )
+        {
+            if( mHomeState.getInputMode() != InputMode.GAMEPAD )
+                mHomeState.setInputMode( InputMode.GAMEPAD );
+            final View compose = findViewById( R.id.composeHome );
+            if( compose != null && !compose.hasFocus() )
+                compose.requestFocus();
+        }
+        return super.dispatchKeyEvent( event );
+    }
+
+    @Override
+    public void onWindowFocusChanged( boolean hasFocus )
+    {
+        super.onWindowFocusChanged( hasFocus );
+        if( hasFocus )
+            updateControllerState();
+    }
+
+    /** Bridges the Compose gamer UI to the existing library, launch and settings logic. */
+    private HomeActions createHomeActions()
+    {
+        return new HomeActions()
+        {
+            @Override
+            public void onSearch( String query )
+            {
+                mSearchQuery = query;
+                refreshGridAsync();
+            }
+
+            @Override
+            public void onPlay( GalleryItem item, int mode )
+            {
+                if( item.romUri == null )
+                    return;
+                final boolean restart = mode != PlayMode.RESUME;
+                final boolean netplay = mode == PlayMode.NETPLAY_JOIN || mode == PlayMode.NETPLAY_HOST;
+                final boolean netplayServer = mode == PlayMode.NETPLAY_HOST;
+                launchGameActivity( item.romUri, item.zipUri, item.md5, item.crc, item.headerName,
+                        item.countryCode.getValue(), item.artPath, item.goodName, item.displayName,
+                        restart, netplay, netplayServer );
+            }
+
+            @Override
+            public void onToggleFavorite( GalleryItem item )
+            {
+                PlayStats.setFavorite( GalleryActivity.this, item.md5, !item.favorite );
+                refreshGridAsync();
+            }
+
+            @Override
+            public void onGameSettings( GalleryItem item )
+            {
+                tagForRefreshNeeded();
+                ActivityHelper.startGamePrefsActivity( GalleryActivity.this, item.romUri,
+                        item.md5, item.crc, item.headerName, item.goodName, item.displayName, item.countryCode.getValue() );
+            }
+
+            @Override
+            public void onRemove( GalleryItem item )
+            {
+                mSelectedItem = item;
+                final CharSequence title = getText( R.string.confirm_title );
+                final CharSequence message = getText( R.string.confirmRemoveFromLibrary_message );
+                final ConfirmationDialog confirmationDialog =
+                        ConfirmationDialog.newInstance( REMOVE_FROM_LIBRARY_DIALOG_ID, title.toString(), message.toString() );
+                confirmationDialog.show( getSupportFragmentManager(), STATE_REMOVE_FROM_LIBRARY_DIALOG );
+            }
+
+            @Override
+            public void onShortcut( GalleryItem item )
+            {
+                createGameShortcut( item );
+            }
+
+            @Override
+            public void onAddGames()
+            {
+                onFabRefreshRomsClick( null );
+            }
+
+            @Override
+            public void onSettingsRow( int rowId )
+            {
+                final View row = findViewById( rowId );
+                if( row != null )
+                    onSettingsRowClick( row );
+            }
+        };
+    }
+
+    private static List<GalleryItem> onlyFavorites( List<GalleryItem> source )
+    {
+        final List<GalleryItem> result = new ArrayList<>();
+        for( final GalleryItem item : source )
+            if( item.favorite )
+                result.add( item );
+        return result;
+    }
+
+    private void setFavoritesFilter( boolean favoritesOnly )
+    {
+        if( mFavoritesOnly == favoritesOnly )
+            return;
+        mFavoritesOnly = favoritesOnly;
+        PreferenceManager.getDefaultSharedPreferences( this ).edit().putBoolean( PREF_FAVORITES_ONLY, favoritesOnly ).apply();
+        updateFilterChips();
+        refreshGrid( mItemsCache, mRecentItemsCache );
+    }
+
+    private void updateFilterChips()
+    {
+        if( mFilterAll == null || mFilterFavorites == null )
+            return;
+        mFilterAll.setSelected( !mFavoritesOnly );
+        mFilterFavorites.setSelected( mFavoritesOnly );
+    }
+
+    private String buildStatsText( GalleryItem item )
+    {
+        final StringBuilder text = new StringBuilder();
+        if( item.favorite )
+            text.append( getString( R.string.stat_favorite ) ).append( '\n' );
+        if( item.lastPlayed > 0 )
+            text.append( getString( R.string.stat_lastPlayed, PlayStats.formatLastPlayed( this, item.lastPlayed ) ) );
+        else
+            text.append( getString( R.string.stat_neverPlayed ) );
+        if( item.playSeconds > 0 )
+            text.append( '\n' ).append( getString( R.string.stat_timePlayed, PlayStats.formatDuration( this, item.playSeconds ) ) );
+        return text.toString();
+    }
+
     public void onGalleryItemClick(GalleryItem item)
     {
+        if( mComposeActive )
+            return;
         mSelectedItem = item;
 
         // Show the game info sidebar
@@ -1027,10 +1277,18 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
 
         // Set the game title
         mGameSidebar.setTitle(item.displayName);
+        mGameSidebar.setStats(buildStatsText(item));
 
 
         // Restore the menu
         mGameSidebar.setActionHandler(GalleryActivity.this, R.menu.gallery_game_drawer);
+
+        final MenuItem favoriteItem = mGameSidebar.getMenu().findItem(R.id.menuItem_favorite);
+        if (favoriteItem != null)
+        {
+            favoriteItem.setTitle(item.favorite ? R.string.menuItem_unfavorite : R.string.menuItem_favorite);
+            mGameSidebar.reload();
+        }
 
         if (mAppData.isAndroidTv)
         {
@@ -1118,6 +1376,19 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
 
     synchronized void refreshGrid(List<GalleryItem> items, List<GalleryItem> recentItems)
     {
+        mHomeState.update( items, recentItems );
+
+        if( mFavoritesOnly )
+        {
+            items = onlyFavorites( items );
+            recentItems = onlyFavorites( recentItems );
+            if( items.isEmpty() )
+            {
+                items = new ArrayList<>();
+                items.add( new GalleryItem( this, getString( R.string.gallery_favorites_empty ) ) );
+            }
+        }
+
         if( mGlobalPrefs.isRecentShown && TextUtils.isEmpty(mSearchQuery) && recentItems.size() > 0 )
         {
             List<GalleryItem> combinedItems = new ArrayList<>();
@@ -1172,7 +1443,7 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
         List<GalleryItem> galleryItems = items;
         mGridView.setAdapter( new GalleryItem.Adapter( this, items ) );
 
-        if (mSelectedItem != null) {
+        if (mSelectedItem != null && !mComposeActive) {
             // Repopulate the game sidebar
             for (final GalleryItem item : galleryItems) {
                 if (mSelectedItem.md5.equals( item.md5 )) {
@@ -1304,6 +1575,7 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
     }
 
     private void setHomeTab(int tab) {
+        if (mComposeActive) return;
         if (mSettingsPanelHost == null || mTabHome == null || mTabSettings == null) {
             return;
         }
@@ -1336,6 +1608,7 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
     }
 
     private void updateEmptyStateVisibility() {
+        if (mComposeActive) return;
         View emptyIcon = findViewById(R.id.gallery_empty_icon);
         View emptyState = findViewById(R.id.gallery_empty_state);
         boolean isEmpty = mGridView.getAdapter() == null || mGridView.getAdapter().getItemCount() == 0;
