@@ -101,6 +101,9 @@ class PrefsState {
     var version by mutableIntStateOf(0)
     var inputMode by mutableStateOf(if (ControllerUtil.isControllerConnected()) InputMode.GAMEPAD else InputMode.TOUCH)
 
+    /** Dialog currently shown above the list (list choice, slider, text...). */
+    var dialog by mutableStateOf<GxDialogSpec?>(null)
+
     fun bump() {
         version++
     }
@@ -180,6 +183,7 @@ fun PrefsApp(state: PrefsState, provider: PrefsScreenProvider, onBack: () -> Uni
             }
         }
         CompositionLocalProvider(LocalGamepadUi provides gamepadUi) {
+            GxDialogHost(state.dialog) { state.dialog = null }
             Box(
                 Modifier
                     .fillMaxSize()

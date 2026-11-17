@@ -67,6 +67,22 @@ public class ProfilePreference extends ListPreference implements OnPreferenceDia
         a.recycle();
     }
     
+    /** @return true if this preference offers a "manage profiles" screen */
+    public boolean hasManager()
+    {
+        return !TextUtils.isEmpty( mManagerAction );
+    }
+
+    /** Opens the screen that manages the profiles listed by this preference. */
+    public void launchManager()
+    {
+        final Context context = getContext();
+        final Intent activityIntent = new Intent();
+        activityIntent.setAction( mManagerAction );
+        activityIntent.setPackage( context.getPackageName() );
+        context.startActivity( activityIntent );
+    }
+
     @Override
     public void onPrepareDialogBuilder( Context context, Builder builder )
     {
@@ -82,15 +98,7 @@ public class ProfilePreference extends ListPreference implements OnPreferenceDia
                 setValue(getEntryValues()[item].toString());
                 dialog.dismiss();
             });
-            builder.setNeutralButton( R.string.profile_manage_profiles, (dialog, which) -> {
-                Context context1 = ProfilePreference.this.getContext();
-
-                Intent activityIntent = new Intent();
-                activityIntent.setAction(mManagerAction);
-                activityIntent.setPackage(context1.getPackageName());
-
-                context1.startActivity( activityIntent );
-            });
+            builder.setNeutralButton( R.string.profile_manage_profiles, (dialog, which) -> launchManager());
         }
     }
 

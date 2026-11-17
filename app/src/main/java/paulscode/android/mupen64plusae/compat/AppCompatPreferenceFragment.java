@@ -7,6 +7,12 @@ import androidx.fragment.app.FragmentActivity;
 import paulscode.android.mupen64plusae.ui.InputMode;
 import paulscode.android.mupen64plusae.ui.PrefsState;
 import paulscode.android.mupen64plusae.ui.PrefsUi;
+import androidx.preference.ListPreference;
+import androidx.preference.EditTextPreference;
+import paulscode.android.mupen64plusae.preference.CompatListPreference;
+import paulscode.android.mupen64plusae.preference.ProfilePreference;
+import paulscode.android.mupen64plusae.preference.SeekBarPreference;
+import paulscode.android.mupen64plusae.ui.GxDialogSpec;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -171,9 +177,65 @@ public class AppCompatPreferenceFragment extends PreferenceFragmentCompat
         super.onStop();
     }
 
+    private static java.util.List<String> entriesOf(ListPreference preference)
+    {
+        final java.util.ArrayList<String> entries = new java.util.ArrayList<>();
+        final CharSequence[] raw = preference.getEntries();
+        if (raw != null)
+            for (final CharSequence entry : raw)
+                entries.add(String.valueOf(entry));
+        return entries;
+    }
+
+    /** Shows the Compose version of the dialog for the preference types it supports. */
+    private boolean showComposeDialog(Preference preference)
+    {
+        if (preference instanceof CompatListPreference)
+        {
+            final CompatListPreference list = (CompatListPreference) preference;
+            mPrefsState.setDialog(new GxDialogSpec.Choice(String.valueOf(list.getTitle()), entriesOf(list),
+                    list.findIndexOfValue(list.getCurrentValue()), null, null,
+                    index -> list.setValue(list.getEntryValues()[index].toString())));
+            return true;
+        }
+        if (preference instanceof ProfilePreference && ((ProfilePreference) preference).hasManager())
+        {
+            final ProfilePreference profile = (ProfilePreference) preference;
+            mPrefsState.setDialog(new GxDialogSpec.Choice(String.valueOf(profile.getTitle()), entriesOf(profile),
+                    profile.findIndexOfValue(profile.getCurrentValue(null)),
+                    getString(R.string.profile_manage_profiles), profile::launchManager,
+                    index -> profile.setValue(profile.getEntryValues()[index].toString())));
+            return true;
+        }
+        if (preference instanceof SeekBarPreference)
+        {
+            final SeekBarPreference seek = (SeekBarPreference) preference;
+            mPrefsState.setDialog(new GxDialogSpec.Slider(String.valueOf(seek.getTitle()), seek.getMinValue(),
+                    seek.getMaxValue(), seek.getStepSize(), seek.getValue(), seek::getValueString, value -> {
+                        if (seek.callChangeListener(value))
+                            seek.setValue(value);
+                    }));
+            return true;
+        }
+        if (preference instanceof EditTextPreference)
+        {
+            final EditTextPreference edit = (EditTextPreference) preference;
+            final String current = edit.getText();
+            mPrefsState.setDialog(new GxDialogSpec.Text(String.valueOf(edit.getTitle()), current == null ? "" : current, text -> {
+                if (edit.callChangeListener(text))
+                    edit.setText(text);
+            }));
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void onDisplayPreferenceDialog(@NonNull Preference preference)
     {
+        if (showComposeDialog(preference))
+            return;
+
         DialogFragment fragment = null;
 
         if (getActivity() instanceof OnDisplayDialogListener)

@@ -1,5 +1,11 @@
 package paulscode.android.mupen64plusae.dialog;
 
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import androidx.annotation.Nullable;
+import androidx.compose.ui.platform.ComposeView;
+import paulscode.android.mupen64plusae.ui.ConfirmUi;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -45,32 +51,38 @@ public class ConfirmationDialog extends DialogFragment
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
+        // The Compose view drawn in onCreateView provides the scrim and the card
+        return new Dialog(requireContext(), android.R.style.Theme_Translucent_NoTitleBar);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState)
+    {
         final String title = getArguments() != null ? getArguments().getString(STATE_TITLE) : "";
         final String message = getArguments() != null ? getArguments().getString(STATE_MESSAGE) : "";
-        mId = getArguments().getInt(STATE_ID);
+        mId = getArguments() != null ? getArguments().getInt(STATE_ID) : 0;
 
-        // When the user clicks Ok, notify the downstream listener
-        OnClickListener internalListener = (dialog, which) -> {
-            if (getActivity() instanceof PromptConfirmListener)
-            {
-                ((PromptConfirmListener) getActivity()).onPromptDialogClosed(mId, which);
-            }
-            else
-            {
-                Log.e("ConfirmationDialog", "Activity doesn't implement PromptConfirmListener");
-            }
-        };
-
-        Builder builder = new Builder(requireActivity());
-        builder.setTitle(title);
-        builder.setMessage(message);
-        builder.setCancelable(false);
-        builder.setNegativeButton(requireActivity().getString(android.R.string.cancel), internalListener);
-        builder.setPositiveButton(requireActivity().getString( android.R.string.ok ), internalListener);
-
-        return builder.create();
+        final ComposeView view = new ComposeView(requireContext());
+        ConfirmUi.attach(view, title == null ? "" : title, message == null ? "" : message,
+                () -> notifyListener(DialogInterface.BUTTON_POSITIVE),
+                () -> notifyListener(DialogInterface.BUTTON_NEGATIVE));
+        return view;
     }
-    
+
+    private void notifyListener(int which)
+    {
+        if (getActivity() instanceof PromptConfirmListener)
+        {
+            ((PromptConfirmListener) getActivity()).onPromptDialogClosed(mId, which);
+        }
+        else
+        {
+            Log.e("ConfirmationDialog", "Activity doesn't implement PromptConfirmListener");
+        }
+        dismissAllowingStateLoss();
+    }
+
     @Override
     public void onCancel(@NonNull DialogInterface dialog)
     {

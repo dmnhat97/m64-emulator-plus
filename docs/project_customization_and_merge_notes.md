@@ -139,3 +139,9 @@ Applied with `git apply -p1 --directory=mupen64plus-core/upstream` (core: mupen6
 - Settings: `ui/PrefsScreen.kt` renders any `androidx.preference` tree in Compose. All preference activities share `compat/AppCompatPreferenceFragment`; it keeps the original `PreferenceFragmentCompat` (and its RecyclerView, now INVISIBLE) as the controller and overlays a `ComposeView` that reads `getPreferenceScreen()` (title, summary, checked state, enabled, visible, icon) and calls `Preference.performClick()`, so every existing dialog, dependency, change listener and screen navigation keeps working. The list is re-read when a `SharedPreferences` value changes and every 500 ms, because activities change summaries / visibility directly on the preference objects. `AppCompatPreferenceActivity.dispatchKeyEvent` tells the fragment about D-pad / gamepad keys (`onControllerKey`) so the first press already moves the focus.
 - Not yet migrated to Compose: the toolbar shell of the preference activities, the dialogs opened by the pickers (list, slider, profile, player map), the profile list screens and the import / export screen.
 
+
+### Compose dialogs (2026-11)
+- `ui/GxDialogs.kt`: `GxDialogSpec` (Choice, Slider, Text, Confirm) rendered by `GxDialogHost` inside `PrefsApp`.
+- `AppCompatPreferenceFragment.showComposeDialog()` intercepts `onDisplayPreferenceDialog` for list, emulation-profile, seek-bar and edit-text preferences; `ConfirmationDialog` now hosts a Compose confirm body.
+- Still legacy (AppCompat/Material) dialogs: player map, multi-select, shader and cheat pickers, `Prompt.*`, locale, popups, menu dialog, cheat editors, netplay setup, progress and profile-name dialogs.
+- Only the list and slider dialogs were verified on a device; text entry, confirm and the profile-manager list need another pass.

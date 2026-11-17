@@ -24,6 +24,7 @@ Improvements
 - Favorites and per-game play time.
 - Every settings screen uses the same Compose list: cards with icon, title and value, switches, dependent items dimmed, D-pad / A / B navigation with visible focus. Detailed pickers (sliders, lists) still open the classic dialogs.
 - New in-game pause menu (same controller / touch modes): Resume, Screenshot, Save / Load slot, speed, frame limiter, controller paks, save files and Exit. Open it with the Menu key (or by swiping from the left edge); B or Back closes it.
+- Settings dialogs (list choices, sliders, text entry, confirmations, emulation-profile picker) use the same Compose style with D-pad / A / B and touch support.
 - Redesigned dark user interface: gallery, new Settings hub, preference screens with toolbar, themed dialogs, import screen and splash.
 - Netplay: fixed a client crash that kept a device out of a session after a failed connection to a stale mDNS entry.
 - New "Open source licenses" screen in the app (Settings → Tools).

@@ -43,6 +43,10 @@ Improvements
   * All settings screens (display, audio, input, library, netplay, profiles, game settings,
     RetroAchievements...) are rendered by one Compose list in the same style, with controller
     (D-pad / A / B) and touch support.
+  * Common dialogs (list choices, sliders, text entry, confirmations, emulation-profile picker)
+    are Compose dialogs in the same style, with controller (D-pad / A / B) and touch support.
+  * Common dialogs (list choices, sliders, text entry, confirmations, emulation-profile picker)
+    are Compose dialogs in the same style, with controller (D-pad / A / B) and touch support.
   * New in-game pause menu (Compose) with the same controller / touch modes: resume, quick save and
     load slot, screenshot, speed, frame limiter, controller paks, files and exit.
   * Added an "Open source licenses" screen (this notice, GPL text, link to source).
