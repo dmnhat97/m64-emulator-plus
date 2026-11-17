@@ -183,12 +183,26 @@ static void savestates_clear_job(void)
 #define PUTDATA(buff, type, value) \
     do { type x = value; PUTARRAY(&x, buff, type, 1); } while(0)
 
+static int savestates_queue_has_terminator(const char* queue, size_t size)
+{
+    static const char terminator[4] = { -1, -1, -1, -1 };
+
+    for (size_t offset = 0; offset + sizeof(terminator) <= size; offset += 8)
+    {
+        if (memcmp(queue + offset, terminator, sizeof(terminator)) == 0)
+            return 1;
+    }
+
+    return 0;
+}
+
 static int savestates_load_m64p(struct device* dev, char *filepath)
 {
     unsigned char header[44];
     gzFile f;
     unsigned int version;
     int i;
+    int queue_bytes;
     uint32_t FCR31;
 
     size_t savestateSize;
@@ -262,7 +276,8 @@ static int savestates_load_m64p(struct device* dev, char *filepath)
     if (version == 0x00010000) /* original savestate version */
     {
         if (gzread(f, savestateData, savestateSize) != (int)savestateSize ||
-            (gzread(f, queue, sizeof(queue)) % 4) != 0)
+            (queue_bytes = gzread(f, queue, sizeof(queue))) < 0 ||
+            (queue_bytes % 4) != 0)
         {
             main_message(M64MSG_STATUS, OSD_BOTTOM_LEFT, "Could not read Mupen64Plus savestate 1.0 data from %s", filepath);
             free(savestateData);
@@ -283,6 +298,7 @@ static int savestates_load_m64p(struct device* dev, char *filepath)
             SDL_UnlockMutex(savestates_lock);
             return 0;
         }
+        queue_bytes = sizeof(queue);
     }
     else // version >= 0x00010200  saves entire eventqueue, 4-byte using_tlb flags and extra state
     {
@@ -297,10 +313,18 @@ static int savestates_load_m64p(struct device* dev, char *filepath)
             SDL_UnlockMutex(savestates_lock);
             return 0;
         }
+        queue_bytes = sizeof(queue);
     }
 
     gzclose(f);
     SDL_UnlockMutex(savestates_lock);
+
+    if (!savestates_queue_has_terminator(queue, queue_bytes))
+    {
+        main_message(M64MSG_STATUS, OSD_BOTTOM_LEFT, "Invalid event queue in savestate: %s", filepath);
+        free(savestateData);
+        return 0;
+    }
 
     // Parse savestate
     dev->rdram.regs[0][RDRAM_CONFIG_REG]       = GETDATA(curr, uint32_t);
@@ -486,7 +510,7 @@ static int savestates_load_m64p(struct device* dev, char *filepath)
 
     // assert(savestateData+savestateSize == curr)
 
-    to_little_endian_buffer(queue, 4, 256);
+    to_little_endian_buffer(queue, 4, queue_bytes / 4);
     load_eventqueue_infos(&dev->r4300.cp0, queue);
 
 #ifdef NEW_DYNAREC
@@ -622,8 +646,9 @@ static int savestates_load_m64p(struct device* dev, char *filepath)
         /* extra pif channels state */
         for (i = 0; i < PIF_CHANNELS_COUNT; ++i) {
             int offset = GETDATA(curr, int8_t);
-            if (offset >= 0) {
-                setup_pif_channel(&dev->pif.channels[i], dev->pif.ram + offset);
+            if (offset >= 0 && offset < PIF_RAM_SIZE) {
+                setup_pif_channel(&dev->pif.channels[i], dev->pif.ram + offset,
+                    PIF_RAM_SIZE - offset);
             }
             else {
                 disable_pif_channel(&dev->pif.channels[i]);
@@ -767,8 +792,9 @@ static int savestates_load_m64p(struct device* dev, char *filepath)
         /* extra pif channels state */
         for (i = 0; i < PIF_CHANNELS_COUNT; ++i) {
             int offset = GETDATA(curr, int8_t);
-            if (offset >= 0) {
-                setup_pif_channel(&dev->pif.channels[i], dev->pif.ram + offset);
+            if (offset >= 0 && offset < PIF_RAM_SIZE) {
+                setup_pif_channel(&dev->pif.channels[i], dev->pif.ram + offset,
+                    PIF_RAM_SIZE - offset);
             }
             else {
                 disable_pif_channel(&dev->pif.channels[i]);
@@ -992,6 +1018,12 @@ static int savestates_load_pj64(struct device* dev,
     curr += 4;
 
     SaveRDRAMSize = GETDATA(curr, uint32_t);
+    if (SaveRDRAMSize != 0x400000 && SaveRDRAMSize != RDRAM_8MB_SIZE)
+    {
+        main_message(M64MSG_STATUS, OSD_BOTTOM_LEFT,
+            "Invalid Project64 state RDRAM size.");
+        return 0;
+    }
 
     /* Read the rest of the savestate into memory. */
     savestateSize = SaveRDRAMSize + 0x2754;

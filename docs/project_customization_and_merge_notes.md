@@ -120,3 +120,12 @@ Upstream: https://github.com/mupen64plus-ae/mupen64plus-ae (GPL-3.0, active; las
 - Adopted with changes: `03b4c0de3` RetroAchievements via rcheevos (MIT). Changes vs upstream: removed the exported `RetroAchievementsHostOverrideReceiver` (any app could redirect the user's token to its own server), no token in logcat, own User-Agent (`XM64EmulatorPlus (Android)`), RA settings screen uses the `NoActionBar` shell theme, and a "RetroAchievements" row in Settings → Tools (the drawer entry is unreachable in the new UI). Vendored in `ndkLibs/rcheevos`; rebuild `librcheevos.a` with `ndkLibs/rcheevos-build/build.sh`. Verified on device only up to "enabled, not logged in" (no RA account/ROM available to test unlocking).
 - Do not bulk-apply upstream `strings.xml` hunks: they also escape `<small>` as `&lt;small>`, which changes how our labels render.
 
+### Core and GLideN64 backports (2026-11)
+
+Applied with `git apply -p1 --directory=mupen64plus-core/upstream` (core: mupen64plus/mupen64plus-core) and `--directory=mupen64plus-video-gliden64/upstream/` (gonetz/GLideN64):
+
+- Core: e0afbb2c 8a8286ca c1bc39c6 6abdd91c 6ede8b86 3c2955c9 e59bdeb8 277b9059 85e71594 855e1ec0 c5dfc447 4f71d580 305d57a0 e083c3e1 11c80c28 cf4d62d5. `RDRAM_MAX_SIZE` (not defined in our tree) was replaced by `RDRAM_8MB_SIZE` in `savestates.c`. `app/src/main/assets/mupen64plus_data/mupen64plus.ini` is a copy of the core's `data/mupen64plus.ini`; keep them in sync.
+- GLideN64 (memory-safety/robustness only): 95484364 9f8fc1e4 55c436c7 baee1cde 6d0ed40d c3fd3cf6 6393cbf3 dea9feab 7462429e e410f16e 98e4c037 a45c625d a6d11fcb 5832e3fc bf5e9f36 4d297aa1 4abd459a 0f61a134 7f2a9c74 068a5ff4 3014b3cd b628d9a8 fa9a9479 020b6ab5 b8c7da9b.
+- Still open (conflict, need older upstream commits first): core ba95bab9 (netplay packet validation), 11e5b529 and cbab344e (64DD bounds), 94a382c8 (Pokemon Stadium GB Tower), 2b347d45 (dynarec x18); GLideN64 a04081ad (Zelda MM Pictograph Box), 41c7ba27, 46eaaf2d, 09dad6ce, ecb5775f, 47473c2b, e8a5e829 and the F3DEX3 work. These need a larger sync of the vendored snapshots.
+- Smoke-tested on a device (CPH2499, arm64): Glide64 and GLideN64-Fast both run the demo ROM; no accuracy testing with commercial games.
+

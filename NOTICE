@@ -40,6 +40,11 @@ Improvements
     the exported host-override receiver was removed, login tokens are no longer
     written to the log, and the app identifies itself with its own user agent.
     It connects to retroachievements.org only when enabled and logged in.
+  * Emulation core and graphics plugin fixes backported from the upstream
+    projects (Mupen64Plus core, GPL v2 or later; GLideN64, GPL v2): bounds and
+    validation checks (cart ROM, PIF, DMA, save states, textures, RDRAM access),
+    RSP task handling, memory pak and Game Boy Transfer Pak fixes, a controller
+    fix for Wipeout 64, new widescreen hacks and null/overflow checks in GLideN64.
   * Backported from upstream Mupen64Plus AE (GPLv3): support for ROMs larger than
     64 MB (core), fixes for resource leaks in file/zip/texture handling, a locale
     tag fix and removal of a duplicate legacy vibration call.
