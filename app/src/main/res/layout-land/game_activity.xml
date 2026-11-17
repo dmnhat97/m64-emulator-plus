@@ -37,7 +37,7 @@
     <!-- navigation drawer -->
 
     <RelativeLayout
-        android:layout_width="300dip"
+        android:layout_width="340dip"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@drawable/bg_sidebar_panel" >
@@ -48,6 +48,12 @@
             android:layout_height="match_parent"
             android:fillViewport="true"
             style="@style/MupenTheme_Dark_Sidebar" />
+
+        <!-- Compose pause menu; it renders the entries of the legacy menu above (kept for the menu data) -->
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/pauseMenu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </RelativeLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>

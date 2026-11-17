@@ -122,6 +122,11 @@
     <string name="gx_action_settings">Game settings</string>
     <string name="gx_action_shortcut">Create shortcut</string>
     <string name="gx_action_remove">Remove from library</string>
+    <string name="gx_pause_title">PAUSED</string>
+    <string name="gx_pause_game">GAME</string>
+    <string name="gx_pause_files">FILES</string>
+    <string name="gx_pause_more">MORE</string>
+    <string name="gx_pause_hint">A Select   B Resume</string>
     <string name="gx_hint_bar">A Select   B Back   X Details   Y Favorite   L1 / R1 Switch tab</string>
     <string name="menuItem_favorite">Add to favorites</string>
     <string name="menuItem_unfavorite">Remove from favorites</string>

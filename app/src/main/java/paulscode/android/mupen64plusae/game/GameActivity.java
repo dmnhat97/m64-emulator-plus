@@ -60,6 +60,11 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.PointerIcon;
 import android.view.View;
+import paulscode.android.mupen64plusae.ui.PauseUi;
+import paulscode.android.mupen64plusae.ui.PauseState;
+import paulscode.android.mupen64plusae.ui.PauseEntry;
+import paulscode.android.mupen64plusae.ui.PauseActions;
+import androidx.compose.ui.platform.ComposeView;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
@@ -187,6 +192,8 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
     private FpsOverlay mFpsOverlay;
     private DrawerLayout mDrawerLayout;
     private GameSidebar mGameSidebar;
+    private final PauseState mPauseState = new PauseState();
+    private ComposeView mPauseView = null;
     private GameSurface mGameSurface;
 
     // Input resources
@@ -463,6 +470,31 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
         // Handle events from the side bar
         mGameSidebar.setActionHandler(this, R.menu.game_drawer);
 
+        mPauseView = findViewById(R.id.pauseMenu);
+        if (mPauseView != null) {
+            // The legacy sidebar stays in the layout only as the source of the menu entries
+            mGameSidebar.setVisibility(View.INVISIBLE);
+            mPauseState.setTitle(mRomDisplayName != null ? mRomDisplayName : "");
+            mPauseState.setCoverPath(mRomArtPath);
+            PauseUi.attach(mPauseView, mPauseState, new PauseActions() {
+                @Override
+                public void onEntry(int id) {
+                    final MenuItem item = mGameSidebar.getMenu().findItem(id);
+                    if (item != null) {
+                        onGameSidebarAction(item);
+                    }
+                }
+
+                @Override
+                public void onClose() {
+                    if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+                        mDrawerLayout.closeDrawer(GravityCompat.START);
+                        mOverlay.requestFocus();
+                    }
+                }
+            });
+        }
+
         mDisplayResolutionData = new DisplayResolutionData(mGlobalPrefs, this, mDrawerLayout, mGamePrefs.displayScaling);
 
         // Set parameters for shader view
@@ -537,6 +569,7 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
                 }
                 ReloadAllMenus();
                 mDrawerOpenState = true;
+                focusPauseMenu();
             }
 
             @Override
@@ -693,7 +726,7 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
             }
 
             mDrawerLayout.openDrawer(GravityCompat.START);
-            //mGameSidebar.requestFocus();
+            //focusPauseMenu();
             mDrawerLayout.requestFocus();
             ReloadAllMenus();
         }
@@ -796,6 +829,65 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
         }
     }
 
+    /** Reloads the legacy sidebar and mirrors its (possibly renamed) entries into the Compose pause menu. */
+    private void reloadSidebar()
+    {
+        mGameSidebar.reload();
+        refreshPauseMenu();
+    }
+
+    private static PauseEntry toPauseEntry(MenuItem item)
+    {
+        final ArrayList<PauseEntry> children = new ArrayList<>();
+        if (item.hasSubMenu()) {
+            final android.view.SubMenu sub = item.getSubMenu();
+            for (int i = 0; i < sub.size(); i++) {
+                if (sub.getItem(i).isVisible())
+                    children.add(toPauseEntry(sub.getItem(i)));
+            }
+        }
+        return new PauseEntry(item.getItemId(), String.valueOf(item.getTitle()), children);
+    }
+
+    private void refreshPauseMenu()
+    {
+        if (mPauseView == null)
+            return;
+        final android.view.Menu menu = mGameSidebar.getMenu();
+        final ArrayList<PauseEntry> entries = new ArrayList<>();
+        for (int i = 0; i < menu.size(); i++) {
+            if (menu.getItem(i).isVisible())
+                entries.add(toPauseEntry(menu.getItem(i)));
+        }
+        mPauseState.setEntries(entries);
+    }
+
+    private static boolean isControllerConnected()
+    {
+        for (final int id : InputDevice.getDeviceIds()) {
+            final InputDevice device = InputDevice.getDevice(id);
+            if (device == null || device.isVirtual())
+                continue;
+            final int sources = device.getSources();
+            if ((sources & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
+                    || (sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK)
+                return true;
+        }
+        return false;
+    }
+
+    /** Moves the input focus to the pause menu (or the legacy sidebar if Compose is not available). */
+    private void focusPauseMenu()
+    {
+        if (mPauseView != null) {
+            refreshPauseMenu();
+            mPauseState.onOpened(isControllerConnected());
+            mPauseView.requestFocus();
+        } else {
+            mGameSidebar.requestFocus();
+        }
+    }
+
     private void ReloadAllMenus()
     {
         if(mCoreFragment == null) return;
@@ -824,7 +916,7 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
         UpdateControllerMenu(R.id.menuItem_player_three, mGamePrefs.isPlugged[2], 3);
         UpdateControllerMenu(R.id.menuItem_player_four, mGamePrefs.isPlugged[3], 4);
 
-        mGameSidebar.reload();
+        reloadSidebar();
     }
 
     private void UpdateControllerMenu(int menuItemId, boolean isPlugged, int playerNumber)
@@ -861,7 +953,7 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
             mGameSidebar.getMenu().findItem(R.id.menuItem_toggle_speed);
         toggleSpeedItem.setTitle(this.getString(R.string.menuItem_toggleSpeed, mCoreFragment.getCurrentSpeed()));
 
-        mGameSidebar.reload();
+        reloadSidebar();
 
         mGamePrefs.putCurrentSlot(mCoreFragment.getSlot());
     }
@@ -913,7 +1005,7 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
             final MenuItem toggleSpeedItem =
                     mGameSidebar.getMenu().findItem(R.id.menuItem_toggle_speed);
             toggleSpeedItem.setTitle(this.getString(R.string.menuItem_toggleSpeed, mCoreFragment.getCurrentSpeed()));
-            mGameSidebar.reload();
+            reloadSidebar();
         } else if (menuItem.getItemId() ==  R.id.menuItem_set_speed ) {
             mCoreFragment.setCustomSpeedFromPrompt();
         } else if (menuItem.getItemId() ==  R.id.menuItem_screenshot) {
@@ -947,7 +1039,7 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
             final MenuItem frameLimiterItem =
                 mGameSidebar.getMenu().findItem(R.id.menuItem_disable_frame_limiter);
             frameLimiterItem.setTitle(this.getString(resId));
-            mGameSidebar.reload();
+            reloadSidebar();
         } else if (menuItem.getItemId() ==  R.id.menuItem_player_one) {
             setPakTypeFromPrompt(1);
         } else if (menuItem.getItemId() ==  R.id.menuItem_player_two) {
@@ -1478,7 +1570,7 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
 
                         //Update the menu
                         playerMenuItem.setTitleCondensed(GameActivity.this.getString(mGamePrefs.getPakType(player).getResourceString()));
-                        mGameSidebar.reload();
+                        reloadSidebar();
                     }
                 });
     }
@@ -1690,7 +1782,7 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
                     mDrawerLayout.openDrawer(GravityCompat.START);
                     ReloadAllMenus();
                     mDrawerOpenState = true;
-                    mGameSidebar.requestFocus();
+                    focusPauseMenu();
                     mGameSidebar.smoothScrollToPosition(0);
                 }
                 return true;
@@ -1722,7 +1814,7 @@ public class GameActivity extends AppCompatActivity implements PromptConfirmList
                         mDrawerLayout.openDrawer( GravityCompat.START );
                         ReloadAllMenus();
                         mDrawerOpenState = true;
-                        mGameSidebar.requestFocus();
+                        focusPauseMenu();
                         mGameSidebar.smoothScrollToPosition(0);
                     }
                 }

@@ -40,6 +40,8 @@ Improvements
     (focus rings, button hints, D-pad / A / B / X / Y / L1 / R1 navigation, landscape, full screen)
     and a clean touch mode (portrait or landscape) depending on how the player controls it.
   * Favorites and play-time statistics per game.
+  * New in-game pause menu (Compose) with the same controller / touch modes: resume, quick save and
+    load slot, screenshot, speed, frame limiter, controller paks, files and exit.
   * Added an "Open source licenses" screen (this notice, GPL text, link to source).
   * RetroAchievements support (softcore) from upstream Mupen64Plus AE, hardened:
     the exported host-override receiver was removed, login tokens are no longer

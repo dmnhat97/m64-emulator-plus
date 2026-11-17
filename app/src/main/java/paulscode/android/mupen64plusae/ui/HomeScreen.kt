@@ -106,7 +106,7 @@ import paulscode.android.mupen64plusae.util.PlayStats
 private val CardShape = RoundedCornerShape(14.dp)
 
 /** True while the player drives the UI with a controller / D-pad. */
-private val LocalGamepadUi = compositionLocalOf { false }
+internal val LocalGamepadUi = compositionLocalOf { false }
 
 // ---------------------------------------------------------------------------------------------
 // Root
@@ -462,7 +462,7 @@ private fun GameCard(item: GalleryItem, state: HomeState, modifier: Modifier = M
 }
 
 @Composable
-private fun GxButton(text: String, modifier: Modifier = Modifier, primary: Boolean = false, onClick: () -> Unit) {
+internal fun GxButton(text: String, modifier: Modifier = Modifier, primary: Boolean = false, onClick: () -> Unit) {
     var rawFocus by remember { mutableStateOf(false) }
     val focused = rawFocus && LocalGamepadUi.current
     val shape = RoundedCornerShape(24.dp)
@@ -649,7 +649,7 @@ private fun DetailsDialog(item: GalleryItem, state: HomeState, actions: HomeActi
 }
 
 @Composable
-private fun ActionRow(label: String, hint: String?, modifier: Modifier = Modifier, danger: Boolean = false, onClick: () -> Unit) {
+internal fun ActionRow(label: String, hint: String?, modifier: Modifier = Modifier, danger: Boolean = false, onClick: () -> Unit) {
     var rawFocus by remember { mutableStateOf(false) }
     val focused = rawFocus && LocalGamepadUi.current
     val shape = RoundedCornerShape(14.dp)
