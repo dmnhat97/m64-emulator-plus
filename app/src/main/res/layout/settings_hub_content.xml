@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/settingsContentScroll"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/mupen_black">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_settings_card"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/menuItem_settings"
+                android:textColor="@color/mupen_text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <LinearLayout android:id="@+id/rowLibrary" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_storage" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/categoryLibrary_title" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/rowDisplay" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_display" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/categoryDisplay_title" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/rowShaders" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_circuit" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/categoryShaders_title" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/rowAudio" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_controller" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/categoryAudio_title" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/rowInput" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_gamepad" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/categoryInput_title" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/rowTouchscreen" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_phone" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/categoryTouchscreen_title" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/rowData" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_folder" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/categoryData_title" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_settings_card"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/menuItem_profiles"
+                android:textColor="@color/mupen_text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <LinearLayout android:id="@+id/rowEmuProfiles" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_circuit" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/menuItem_emulationProfiles" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/rowTouchProfiles" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_phone" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/menuItem_touchscreenProfiles" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/rowControllerProfiles" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_gamepad" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/menuItem_controllerProfiles" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_settings_card"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/menuItem_Tools"
+                android:textColor="@color/mupen_text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <LinearLayout android:id="@+id/rowImportExport" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_folder" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/importExportActivity_title" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/rowLanguage" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_location" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/menuItem_localeOverride" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/rowReportBug" style="@style/SettingsRowStyle">
+                <ImageView style="@style/SettingsIconStyle" android:src="@drawable/ic_help" />
+                <TextView style="@style/SettingsTextStyle" android:text="@string/menuItem_reportBug" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

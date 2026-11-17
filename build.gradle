@@ -1,0 +1,40 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        mavenCentral()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.13.0'
+
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        google()
+    }
+
+    // GAMUROID: pin the NDK for every module.
+    //
+    // The project does not set ndkVersion anywhere, so AGP picks the newest
+    // installed — here 28.0.13004108 — and ndk-build 28 rejects the ABSOLUTE
+    // paths this tree uses in LOCAL_SRC_FILES:
+    //
+    //   ae-bridge/Android.mk:hidapi: LOCAL_SRC_FILES points to a missing file
+    //
+    // The file is there (ndkLibs/hidapi/upstream/libusb/hid.c, 57 KB); it is the
+    // absolute form that the newer ndk-build no longer accepts. Pinning is one
+    // line and covers the whole class, instead of rewriting each makefile.
+    plugins.withId('com.android.application') { android.ndkVersion = '27.0.12077973' }
+    plugins.withId('com.android.library')     { android.ndkVersion = '27.0.12077973' }
+}
+
+task clean(type: Delete) {
+    delete "$projectDir/build"
+}

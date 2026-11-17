@@ -1,0 +1,87 @@
+XM64 Emulator Plus
+==================
+
+XM64 Emulator Plus is a modified version ("fork") of Mupen64Plus AE (Android Edition):
+
+    https://github.com/mupen64plus-ae/mupen64plus-ae
+
+Mupen64Plus AE is Copyright (C) Paul Lamb and the Mupen64Plus AE contributors,
+and is licensed under the GNU General Public License, version 3 or (at your
+option) any later version. The full text is in the file LICENSE.
+
+XM64 Emulator Plus is NOT the official Mupen64Plus AE and is not endorsed by or
+affiliated with its authors.
+
+The modifications made in this fork are Copyright (C) 2026 XM64 Emulator
+Plus contributors and are released under the same license (GPLv3 or later). The source
+code is available at:
+
+    https://github.com/dmnhat97/m64-emulator-plus
+
+This program comes with ABSOLUTELY NO WARRANTY. It is free software, and you
+are welcome to redistribute it under the conditions of the GNU General Public
+License. See LICENSE for details.
+
+
+Summary of modifications (GPLv3 section 5a)
+-------------------------------------------
+
+Changes relative to upstream Mupen64Plus AE (details in
+docs/project_customization_and_merge_notes.md and the git history):
+
+Improvements
+  * Redesigned dark user interface: gallery, new Settings hub screen, preference
+    screens with a toolbar shell, themed dialogs, import screen and splash.
+  * Netplay: fixed a client crash that kept a device out of a session (the setup
+    dialog was dismissed after being detached when a stale mDNS record caused a
+    failed connection).
+  * Added an "Open source licenses" screen (this notice, GPL text, link to source).
+  * Profiles saved by older versions that selected the removed angrylion-plus
+    plugin are switched automatically to the default plugin.
+
+Removed
+  * The angrylion-plus software renderer (its MAME license forbids commercial use).
+  * The upstream FAQ, help-forum and credits menu entries and web links.
+
+Other
+  * Renamed to "XM64 Emulator Plus", new application ID, new launcher/splash assets.
+  * Based on an earlier upstream snapshot: features added to upstream later (for
+    example RetroAchievements support) are not included.
+
+Individual source files keep their original copyright headers. Upstream files
+that carry no per-file header are covered by the upstream project's license,
+as stated above.
+
+
+Third-party components
+----------------------
+
+Each component keeps its own license; license texts are in the directories
+listed below.
+
+  Component                      License                          Location
+  -----------------------------  -------------------------------  ---------------------------------------------
+  Mupen64Plus core               GPL v2 or later                  mupen64plus-core/upstream/LICENSES
+  GLideN64 video plugin          GPL v2 (+ bundled libs)          mupen64plus-video-gliden64/upstream/LICENSE
+  Rice video plugin              GPL (see LICENSES)               mupen64plus-video-rice/upstream/LICENSES
+  Glide64mk2 video plugin        GPL (see LICENSES)               mupen64plus-video-glide64mk2/upstream/LICENSES
+  gln64 video plugin             GPL (see COPYING)                mupen64plus-video-gln64/src/COPYING
+  parallel-rdp video plugin      MIT                              mupen64plus-video-parallel/upstream/LICENSE
+  parallel-rsp                   MIT / LGPL                       mupen64plus-rsp-parallel/upstream/
+  RSP HLE                        GPL (see LICENSES)               mupen64plus-rsp-hle/upstream/LICENSES
+  RSP cxd4                       CC0 1.0                          mupen64plus-rsp-cxd4/upstream/COPYING
+  Raphnet input plugin           GPL (see LICENSES)               mupen64plus-input-raphnet/upstream/LICENSES
+  libusb                         LGPL v2.1                        mupen64plus-input-raphnet/libusb/COPYING
+  SoundTouch                     LGPL v2.1                        ndkLibs/soundtouch/COPYING.TXT
+  libpng                         libpng license                   ndkLibs/png/LICENSE
+  miniupnpc                      BSD 3-clause                     ndkLibs/miniupnp/LICENSE
+  libnatpmp                      BSD 3-clause                     ndkLibs/libnatpmp/LICENSE
+  AndroidX, Material Components  Apache License 2.0               https://developer.android.com/jetpack/androidx
+  Apache Commons (lang3, text,   Apache License 2.0               https://commons.apache.org
+    io, compress)
+  XZ for Java                    Public domain                    https://tukaani.org/xz/java.html
+  JNA                            LGPL 2.1 or Apache 2.0           https://github.com/java-native-access/jna
+
+Nintendo 64 and related names are trademarks of their respective owners. This
+project is not affiliated with Nintendo. It does not include any ROMs or BIOS
+images; you must supply your own legally obtained game files.

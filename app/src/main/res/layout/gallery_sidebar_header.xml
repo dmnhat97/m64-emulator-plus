@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="8dp"
+    android:background="@drawable/bg_sidebar_panel" >
+
+    <ImageView
+        android:id="@+id/headerLogoArt"
+        android:layout_width="match_parent"
+        android:layout_height="176dip"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="12dp"
+        android:scaleType="centerInside"
+        android:focusable="false"
+        android:src="@drawable/ouya_icon"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="6dp"
+        android:text="@string/app_name"
+        android:gravity="center_horizontal"
+        style="@style/TextAppearance.Mupen.Title" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_horizontal"
+        android:text="@string/sidebar_tagline"
+        style="@style/TextAppearance.Mupen.Subtitle" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:background="@color/mupen_outline" />
+
+</LinearLayout>

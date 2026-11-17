@@ -1,0 +1,13 @@
+
+android {
+    compileSdkVersion 36
+    // NDK r28+ builds 16 KB–aligned ELF by default (required for 16 KB page devices / Play policy)
+    ndkVersion = "28.0.13004108"
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 36
+        versionCode = 4
+        versionName = "2.1"
+    }
+}
