@@ -40,6 +40,9 @@ Improvements
     (focus rings, button hints, D-pad / A / B / X / Y / L1 / R1 navigation, landscape, full screen)
     and a clean touch mode (portrait or landscape) depending on how the player controls it.
   * Favorites and play-time statistics per game.
+  * All settings screens (display, audio, input, library, netplay, profiles, game settings,
+    RetroAchievements...) are rendered by one Compose list in the same style, with controller
+    (D-pad / A / B) and touch support.
   * New in-game pause menu (Compose) with the same controller / touch modes: resume, quick save and
     load slot, screenshot, speed, frame limiter, controller paks, files and exit.
   * Added an "Open source licenses" screen (this notice, GPL text, link to source).

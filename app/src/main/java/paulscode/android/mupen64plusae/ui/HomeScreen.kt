@@ -625,9 +625,13 @@ private fun DetailsDialog(item: GalleryItem, state: HomeState, actions: HomeActi
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                CoverImage(item.artPath, Modifier.fillMaxWidth().aspectRatio(2.2f).clip(RoundedCornerShape(16.dp)))
-                Text(item.toString(), fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Gx.Text, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Text(statsText(item), fontSize = 12.sp, color = Gx.TextDim)
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                    CoverImage(item.artPath, Modifier.width(112.dp).height(84.dp).clip(RoundedCornerShape(12.dp)))
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(item.toString(), fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Gx.Text, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Text(statsText(item), fontSize = 11.sp, color = Gx.TextDim, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                    }
+                }
                 Spacer(Modifier.height(4.dp))
                 ActionRow(stringResource(R.string.gx_resume), stringResource(R.string.gx_hint_resume), Modifier.focusRequester(firstFocus)) {
                     close(); actions.onPlay(item, PlayMode.RESUME)

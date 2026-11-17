@@ -302,4 +302,42 @@ public abstract class AppCompatPreferenceActivity extends AppCompatActivity impl
     }
     
     
+
+    private static androidx.compose.ui.platform.ComposeView findComposeView( android.view.View view )
+    {
+        if( view instanceof androidx.compose.ui.platform.ComposeView )
+            return (androidx.compose.ui.platform.ComposeView) view;
+        if( view instanceof android.view.ViewGroup )
+        {
+            final android.view.ViewGroup group = (android.view.ViewGroup) view;
+            for( int i = 0; i < group.getChildCount(); i++ )
+            {
+                final androidx.compose.ui.platform.ComposeView found = findComposeView( group.getChildAt( i ) );
+                if( found != null )
+                    return found;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * A D-pad or gamepad button press hands the focus to the Compose settings list, so the very first
+     * press already moves the highlight.
+     */
+    @Override
+    public boolean dispatchKeyEvent( android.view.KeyEvent event )
+    {
+        final int keyCode = event.getKeyCode();
+        if( event.getAction() == android.view.KeyEvent.ACTION_DOWN
+                && ( ( keyCode >= android.view.KeyEvent.KEYCODE_DPAD_UP && keyCode <= android.view.KeyEvent.KEYCODE_DPAD_CENTER )
+                || android.view.KeyEvent.isGamepadButton( keyCode ) ) )
+        {
+            for( final androidx.fragment.app.Fragment fragment : getSupportFragmentManager().getFragments() )
+            {
+                if( fragment instanceof AppCompatPreferenceFragment && fragment.isVisible() )
+                    ( (AppCompatPreferenceFragment) fragment ).onControllerKey();
+            }
+        }
+        return super.dispatchKeyEvent( event );
+    }
 }

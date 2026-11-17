@@ -1,5 +1,12 @@
 package paulscode.android.mupen64plusae.compat;
 
+import android.content.SharedPreferences;
+import android.widget.FrameLayout;
+import androidx.compose.ui.platform.ComposeView;
+import androidx.fragment.app.FragmentActivity;
+import paulscode.android.mupen64plusae.ui.InputMode;
+import paulscode.android.mupen64plusae.ui.PrefsState;
+import paulscode.android.mupen64plusae.ui.PrefsUi;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -55,6 +62,10 @@ public class AppCompatPreferenceFragment extends PreferenceFragmentCompat
     private static final String STATE_RESOURCE_ID = "STATE_RESOURCE_ID";
     
     private boolean mHasFocusBeenSet = false;
+    private final PrefsState mPrefsState = new PrefsState();
+    private ComposeView mCompose = null;
+    private final SharedPreferences.OnSharedPreferenceChangeListener mPrefsListener =
+            (sharedPreferences, key) -> mPrefsState.bump();
 
     public static AppCompatPreferenceFragment newInstance(String sharedPrefsName, int resourceId, String rootKey)
     {
@@ -107,8 +118,57 @@ public class AppCompatPreferenceFragment extends PreferenceFragmentCompat
         }
         
         mHasFocusBeenSet = false;
-        
-        return super.onCreateView(inflater, container, savedInstanceState);
+
+        final View base = super.onCreateView(inflater, container, savedInstanceState);
+
+        // The Compose settings UI renders the live preference tree. The original RecyclerView stays in
+        // the hierarchy (hidden) because the rest of the code and the preference library still use it.
+        final Context context = inflater.getContext();
+        final FrameLayout wrapper = new FrameLayout(context);
+        wrapper.addView(base, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        base.setVisibility(View.INVISIBLE);
+
+        final ComposeView compose = new ComposeView(context);
+        compose.setFocusable(true);
+        compose.setFocusableInTouchMode(true);
+        PrefsUi.attach(compose, mPrefsState, this::getPreferenceScreen, () -> {
+            final FragmentActivity activity = getActivity();
+            if (activity != null)
+                activity.getOnBackPressedDispatcher().onBackPressed();
+        });
+        wrapper.addView(compose, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mCompose = compose;
+
+        return wrapper;
+    }
+
+    /** Called by the host activity when a D-pad / gamepad key is pressed. */
+    public void onControllerKey()
+    {
+        mPrefsState.setInputMode( InputMode.GAMEPAD );
+        if( mCompose != null && !mCompose.hasFocus() )
+            mCompose.requestFocus();
+    }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        final SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
+        if (prefs != null)
+            prefs.registerOnSharedPreferenceChangeListener(mPrefsListener);
+        mPrefsState.bump();
+        if (mCompose != null)
+            mCompose.requestFocus();
+    }
+
+    @Override
+    public void onStop()
+    {
+        final SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
+        if (prefs != null)
+            prefs.unregisterOnSharedPreferenceChangeListener(mPrefsListener);
+        super.onStop();
     }
 
     @Override
