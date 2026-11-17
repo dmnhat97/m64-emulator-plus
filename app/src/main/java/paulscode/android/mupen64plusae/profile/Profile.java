@@ -89,16 +89,24 @@ public class Profile implements Comparable<Profile>
         this.isBuiltin = isBuiltin;
         this.name = section.name;
         this.comment = section.get( KEY_COMMENT );
+        migrateRemovedPlugins( section );
         for( String key : section.keySet() )
             this.data.put( key, section.get( key ) );
+    }
 
-        // The angrylion-plus software renderer was removed (its license forbids commercial use).
-        // Profiles saved by older versions that still select it fall back to the default plugin.
-        final String videoPlugin = this.data.get( "videoPlugin" );
+    /**
+     * The angrylion-plus software renderer was removed (its license forbids commercial use).
+     * Profiles saved by older versions that still select it fall back to the default plugin.
+     *
+     * @param section the profile section to fix up in memory
+     */
+    public static void migrateRemovedPlugins( ConfigSection section )
+    {
+        final String videoPlugin = section.get( "videoPlugin" );
         if( videoPlugin != null && videoPlugin.toLowerCase().contains( "angrylion" ) )
         {
-            this.data.put( "videoPlugin", "glide64mk2" );
-            this.data.put( "rspSetting", "rsp-hle" );
+            section.put( "videoPlugin", "glide64mk2" );
+            section.put( "rspSetting", "rsp-hle" );
         }
     }
     

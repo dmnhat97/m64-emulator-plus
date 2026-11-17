@@ -1349,7 +1349,8 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
         int[] rowIds = new int[]{
                 R.id.rowLibrary, R.id.rowDisplay, R.id.rowShaders, R.id.rowAudio, R.id.rowInput,
                 R.id.rowTouchscreen, R.id.rowData, R.id.rowEmuProfiles, R.id.rowTouchProfiles,
-                R.id.rowControllerProfiles, R.id.rowImportExport, R.id.rowLanguage, R.id.rowReportBug
+                R.id.rowControllerProfiles, R.id.rowImportExport, R.id.rowLanguage, R.id.rowReportBug,
+                R.id.rowLicenses
         };
 
         for (int id : rowIds) {
@@ -1400,6 +1401,8 @@ public class GalleryActivity extends AppCompatActivity implements GameSidebarAct
             final CharSequence title = getText(R.string.menuItem_localeOverride);
             final LocaleDialog localeDialog = LocaleDialog.newInstance(title.toString());
             localeDialog.show(getSupportFragmentManager(), STATE_LOCALE_DIALOG);
+        } else if (id == R.id.rowLicenses) {
+            LicensesDialog.show(this);
         } else if (id == R.id.rowReportBug) {
             launchPlayStoreRating();
         }

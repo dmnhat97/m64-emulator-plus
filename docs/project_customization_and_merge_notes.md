@@ -110,3 +110,13 @@ Re-enable only intentionally:
 
 - Some legacy keys are intentionally kept as default fallback strings to avoid resource merge warnings when locale packs define those keys.
 - This document should be updated every time product-specific behavior diverges from upstream.
+
+## Upstream Sync Status (as of 2026-11)
+
+Upstream: https://github.com/mupen64plus-ae/mupen64plus-ae (GPL-3.0, active; last checked commit 33bf70215, 2026-08-28).
+
+- Adopted: `32e19db5a` Allow loading 64MB+ ROMs; `33bf70215` Fix resource leaks (all files except `gradle.properties`); `-dontwarn com.github.luben.zstd.**` in `proguard-rules.pro`.
+- Deliberately NOT adopted: `62ba760e3` manual ROM path entry. It adds `MANAGE_EXTERNAL_STORAGE` (restricted by Google Play) and only helps Android TV 11+.
+- Not yet adopted: `03b4c0de3` RetroAchievements via rcheevos (151 files, needs native rebuild of `librcheevos.a` for all ABIs, network config for retroachievements.org, and an RA account + ROM to test; rcheevos is MIT).
+- Do not bulk-apply upstream `strings.xml` hunks: they also escape `<small>` as `&lt;small>`, which changes how our labels render.
+

@@ -152,6 +152,12 @@ public abstract class ProfileActivity extends AppCompatPreferenceActivity implem
         
         // Load the config file and working cache
         mConfigFile = new ConfigFile( configPath );
+        for( String sectionName : mConfigFile.keySet() )
+        {
+            final ConfigSection section = mConfigFile.get( sectionName );
+            if( section != null )
+                Profile.migrateRemovedPlugins( section );
+        }
         
         mPrefs = getSharedPreferences( PREFS_NAME, MODE_PRIVATE );
         transcribe( mConfigFile, mPrefs, mProfileName );

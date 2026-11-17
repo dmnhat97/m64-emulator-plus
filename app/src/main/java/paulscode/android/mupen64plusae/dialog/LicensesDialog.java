@@ -32,6 +32,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 
 import paulscode.android.mupen64plusae.R;
 
@@ -42,6 +43,7 @@ public final class LicensesDialog
 {
     private static final String NOTICE_ASSET = "licenses/NOTICE.txt";
     private static final String GPL_ASSET = "licenses/gpl-3.0.txt";
+    private static final Pattern URL_PATTERN = Pattern.compile("https?://[^\\s]+");
 
     private LicensesDialog() {}
 
@@ -57,7 +59,7 @@ public final class LicensesDialog
         text.setTypeface(android.graphics.Typeface.MONOSPACE);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         text.setTextIsSelectable(true);
-        Linkify.addLinks(text, Linkify.WEB_URLS);
+        Linkify.addLinks(text, URL_PATTERN, null);
         text.setMovementMethod(LinkMovementMethod.getInstance());
         final int pad = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16,
                 context.getResources().getDisplayMetrics());
@@ -71,7 +73,7 @@ public final class LicensesDialog
 
         if (main) {
             builder.setNeutralButton(R.string.licenses_sourceCode, (dialog, which) -> openSource(context));
-            builder.setNegativeButton(R.string.licenses_fullGpl, (dialog, which) ->
+            builder.setNegativeButton(R.string.licenses_gplButton, (dialog, which) ->
                     showText(context, context.getString(R.string.licenses_fullGpl), GPL_ASSET, false));
         }
         builder.create().show();

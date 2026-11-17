@@ -33,6 +33,7 @@ import androidx.fragment.app.FragmentManager;
 import java.io.File;
 
 import paulscode.android.mupen64plusae.dialog.ConfirmationDialog;
+import paulscode.android.mupen64plusae.dialog.LicensesDialog;
 import paulscode.android.mupen64plusae.dialog.LocaleDialog;
 import paulscode.android.mupen64plusae.dialog.Popups;
 import paulscode.android.mupen64plusae.persistent.AppData;
@@ -86,7 +87,7 @@ public class SettingsHubActivity extends AppCompatActivity implements Confirmati
         int[] rowIds = new int[]{
                 R.id.rowLibrary, R.id.rowDisplay, R.id.rowShaders, R.id.rowAudio, R.id.rowInput,
                 R.id.rowTouchscreen, R.id.rowData, R.id.rowEmuProfiles, R.id.rowTouchProfiles,
-                R.id.rowControllerProfiles, R.id.rowImportExport, R.id.rowLanguage, R.id.rowReportBug
+                R.id.rowControllerProfiles, R.id.rowImportExport, R.id.rowLanguage, R.id.rowReportBug, R.id.rowLicenses
         };
         for (int id : rowIds) {
             View row = findViewById(id);
@@ -126,6 +127,8 @@ public class SettingsHubActivity extends AppCompatActivity implements Confirmati
             final LocaleDialog localeDialog = LocaleDialog.newInstance(title.toString());
             final FragmentManager fm = getSupportFragmentManager();
             localeDialog.show(fm, STATE_LOCALE_DIALOG);
+        } else if (id == R.id.rowLicenses) {
+            LicensesDialog.show(this);
         } else if (id == R.id.rowReportBug) {
             final String packageName = getPackageName();
             try {

@@ -94,8 +94,9 @@
     <string name="menuItem_credits">Credits</string>
     <string name="menuItem_appVersion">App version</string>
     <string name="menuItem_licenses">Open source licenses</string>
-    <string name="licenses_sourceCode">Source code</string>
-    <string name="licenses_fullGpl">GPL v3 text</string>
+    <string name="licenses_sourceCode">Source</string>
+    <string name="licenses_fullGpl">GNU GPL v3</string>
+    <string name="licenses_gplButton">GPLv3</string>
     <string name="menuItem_logcat">Logcat</string>
     <string name="menuItem_hardwareInfo">Hardware info</string>
     <string name="menuItem_Tools">Tools</string>

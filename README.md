@@ -22,14 +22,15 @@ No ROMs or BIOS images are included; you must supply your own legally obtained g
 Improvements
 - Redesigned dark user interface: gallery, new Settings hub, preference screens with toolbar, themed dialogs, import screen and splash.
 - Netplay: fixed a client crash that kept a device out of a session after a failed connection to a stale mDNS entry.
-- New "Open source licenses" screen in the app.
+- New "Open source licenses" screen in the app (Settings → Tools).
+- Backported from upstream Mupen64Plus AE: support for ROMs larger than 64 MB, resource-leak fixes, locale tag fix, duplicate vibration call removed.
 - Old profiles that used the removed angrylion-plus plugin switch automatically to the default plugin.
 
 Removed
 - The angrylion-plus software renderer (its MAME license forbids commercial use and is not GPL-compatible).
 - Upstream FAQ, help-forum and credits menu entries and links.
 
-Note: this fork is based on an earlier upstream snapshot, so features added to upstream later (for example RetroAchievements) are not included. Full details: [NOTICE](NOTICE) and `docs/project_customization_and_merge_notes.md`.
+Note: this fork is based on an earlier upstream snapshot. Upstream RetroAchievements support and upstream's manual ROM-path entry (which needs the restricted "All files access" permission) are not included. Full details: [NOTICE](NOTICE) and `docs/project_customization_and_merge_notes.md`.
 
 ## Build Instructions
 
